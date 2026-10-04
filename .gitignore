@@ -1,0 +1,28 @@
+# Build output
+/bin/
+/dist/
+/engine
+*.exe
+*.test
+*.out
+
+# Coverage
+coverage.*
+*.coverprofile
+
+# Go workspace
+go.work
+go.work.sum
+
+# Local env and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Editors and OS
+.idea/
+.vscode/
+*.swp
+.DS_Store

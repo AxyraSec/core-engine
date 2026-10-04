@@ -1,0 +1,8 @@
+# Default owners for everything in the repo.
+*                     @AxyraSec
+
+# Evidence chain: tamper-evident log, needs careful review.
+/internal/evidence/   @AxyraSec
+
+# CI/CD, workflows and repo settings.
+/.github/             @AxyraSec
