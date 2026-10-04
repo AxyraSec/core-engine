@@ -1,0 +1,49 @@
+version: "2"
+
+run:
+  timeout: 5m
+
+linters:
+  default: standard
+  enable:
+    - bodyclose
+    - depguard
+    - errorlint
+    - gosec
+    - misspell
+    - nilerr
+    - revive
+    - unconvert
+  settings:
+    depguard:
+      # Module boundaries. See README.md, "Dependency rules".
+      rules:
+        no-protocol-imports:
+          # Only internal/protocol/mcp may call the core modules, never the reverse.
+          files:
+            - "**/internal/identity/**"
+            - "**/internal/delegation/**"
+            - "**/internal/authz/**"
+            - "**/internal/enforcement/**"
+            - "**/internal/evidence/**"
+          deny:
+            - pkg: github.com/AxyraSec/core-engine/internal/protocol
+              desc: core modules must not depend on protocol adapters
+        evidence-isolated:
+          # internal/evidence must not depend on any other internal module.
+          files:
+            - "**/internal/evidence/**"
+          deny:
+            - pkg: github.com/AxyraSec/core-engine/internal/identity
+              desc: internal/evidence must not depend on other internal modules
+            - pkg: github.com/AxyraSec/core-engine/internal/delegation
+              desc: internal/evidence must not depend on other internal modules
+            - pkg: github.com/AxyraSec/core-engine/internal/authz
+              desc: internal/evidence must not depend on other internal modules
+            - pkg: github.com/AxyraSec/core-engine/internal/enforcement
+              desc: internal/evidence must not depend on other internal modules
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
