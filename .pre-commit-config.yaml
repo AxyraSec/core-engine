@@ -1,0 +1,42 @@
+# Local hooks. Setup: `pipx install pre-commit && pre-commit install`
+# Run on all files: `pre-commit run --all-files`
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c # frozen: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ["--maxkb=500"]
+      - id: detect-private-key
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: 83d9cd684c87d95d656c1458ef04895a7f1cbd8e # frozen: v8.30.1
+    hooks:
+      - id: gitleaks
+
+  # Go hooks use the tools installed on your machine.
+  - repo: local
+    hooks:
+      - id: gofmt
+        name: gofmt
+        entry: bash -c 'out=$(gofmt -l "$@"); [ -z "$out" ] || { echo "Run gofmt -w on:"; echo "$out"; exit 1; }' --
+        language: system
+        types: [go]
+
+      - id: golangci-lint
+        name: golangci-lint
+        entry: golangci-lint run --new-from-rev HEAD
+        language: system
+        types: [go]
+        pass_filenames: false
+
+      - id: go-mod-tidy
+        name: go mod tidy
+        entry: go mod tidy -diff
+        language: system
+        files: (^|/)go\.(mod|sum)$|\.go$
+        pass_filenames: false

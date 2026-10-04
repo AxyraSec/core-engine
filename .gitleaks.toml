@@ -1,0 +1,13 @@
+# gitleaks config: default rules plus a few path exclusions.
+# Docs: https://github.com/gitleaks/gitleaks#configuration
+
+title = "core-engine"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Generated files with hashes, not secrets"
+paths = [
+  '''(^|/)go\.sum$''',
+]

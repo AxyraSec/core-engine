@@ -32,7 +32,7 @@ docker: ## Build the container image (no push)
 
 .PHONY: security
 security: ## Run govulncheck and gitleaks
-	@command -v govulncheck >/dev/null || { echo "govulncheck not found: go install golang.org/x/vuln/cmd/govulncheck@latest"; exit 1; }
+	@command -v govulncheck >/dev/null || { echo "govulncheck not found: go install golang.org/x/vuln/cmd/govulncheck@v1.8.0"; exit 1; }
 	@command -v gitleaks >/dev/null || { echo "gitleaks not found: https://github.com/gitleaks/gitleaks#installing"; exit 1; }
 	govulncheck ./...
 	gitleaks git --redact .
