@@ -56,6 +56,14 @@ func NewPolicy(rules []Rule) (*Policy, error) {
 	return &Policy{rules: copied}, nil
 }
 
+// Len returns the number of rules in the policy.
+func (p *Policy) Len() int {
+	if p == nil {
+		return 0
+	}
+	return len(p.rules)
+}
+
 // Evaluate decides whether req is allowed.
 // Deny rules win over allow rules. With no matching rule, the request is denied.
 // A nil Policy denies everything.

@@ -21,6 +21,29 @@ an action (for example `tools/call`) and a resource (for example `mcp:github/cre
 
 Each decision carries the rule ID and a stable reason, for the evidence log.
 
+### Policy file
+
+Policies are written in YAML. See [policies/example.yaml](../policies/example.yaml).
+
+```yaml
+version: 1
+rules:
+  - id: allow-billing-bot-github
+    effect: allow            # allow or deny
+    subjects: ["agent:billing-bot"]
+    actions: ["tools/call"]
+    resources: ["mcp:github/*"]
+```
+
+Loading is strict, and a file is either fully loaded or rejected:
+
+- `version: 1` is required.
+- Unknown fields (typos such as `efect`) and duplicate keys are rejected.
+- One YAML document per file, at most 1 MiB.
+- Every rule then goes through the same validation as rules built in code.
+
+`engine -policy <file>` checks a file and exits with a non-zero code if it is invalid.
+
 ## Enforcement
 
 ## Evidence

@@ -56,6 +56,12 @@ make test       # runs unit tests with -race
 make lint       # runs golangci-lint
 ```
 
+Check a policy file:
+
+```sh
+./bin/engine -policy policies/example.yaml
+```
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
