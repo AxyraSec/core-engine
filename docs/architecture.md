@@ -25,6 +25,11 @@ Each decision carries the rule ID and a stable reason, for the evidence log.
 
 ## Evidence
 
+`internal/evidence` records every decision in a hash chain: each record holds the hash of
+the previous one, so any later change is detected by `Verify`. It does not import any other
+internal module; callers copy the decision into an `evidence.Entry`.
+See [evidence-chain.md](evidence-chain.md).
+
 ## Protocol adapters
 
 ### MCP
