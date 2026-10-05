@@ -13,3 +13,4 @@ and this project follows [Semantic Versioning](https://semver.org/).
 - Project docs: README, contributing guide, security policy, ADRs.
 - `internal/authz`: deny-by-default policy evaluation (allow/deny rules, prefix wildcards, deny wins).
 - `internal/evidence`: in-memory, hash-chained evidence log with `Verify` to detect tampering.
+- YAML policy files (`authz.LoadPolicyFile`), strict loading, and `engine -policy <file>` to check one.

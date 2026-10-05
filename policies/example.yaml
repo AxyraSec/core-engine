@@ -1,0 +1,20 @@
+# Example policy. Format: docs/architecture.md, "Authorization".
+#
+# Deny by default: a request is allowed only if an allow rule matches it,
+# and a matching deny rule always wins.
+version: 1
+
+rules:
+  # The billing bot may call any tool of the GitHub MCP server...
+  - id: allow-billing-bot-github
+    effect: allow
+    subjects: ["agent:billing-bot"]
+    actions: ["tools/call"]
+    resources: ["mcp:github/*"]
+
+  # ...except deleting a repository, for every agent.
+  - id: deny-github-delete-repo
+    effect: deny
+    subjects: ["*"]
+    actions: ["tools/call"]
+    resources: ["mcp:github/delete_repo"]
