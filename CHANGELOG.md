@@ -11,3 +11,4 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 - Repository structure, Go module and minimal `engine` binary.
 - Project docs: README, contributing guide, security policy, ADRs.
+- `internal/authz`: deny-by-default policy evaluation (allow/deny rules, prefix wildcards, deny wins).
