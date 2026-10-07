@@ -31,13 +31,41 @@ We will not take legal action against good-faith research that respects this pol
 
 ## Supported versions
 
-The project is in early development. Only the latest release receives security fixes.
+The project is in early development. No release has been published yet.
 
-| Version         | Supported |
-|-----------------|-----------|
-| latest release  | Yes       |
-| older releases  | No        |
+| Version                        | Supported |
+|--------------------------------|-----------|
+| `main` (unreleased)            | Yes       |
+| latest release (once tagged)   | Yes       |
+| older releases                 | No        |
+
+## Versions in use
+
+Versions the engine is built and checked with. Report issues against these.
+
+| Component                  | Version                                   |
+|----------------------------|-------------------------------------------|
+| Go toolchain               | 1.26.8 (minimum `go 1.26.0`)              |
+| `go.yaml.in/yaml/v3`       | v3.0.5 (only third-party Go dependency)   |
+| Build image                | `golang:1.26-alpine`, pinned by digest    |
+| Runtime image              | `distroless/static-debian13:nonroot`, pinned by digest |
+| golangci-lint (gosec, depguard) | v2.14.0                              |
+| govulncheck                | v1.8.0                                    |
+| gitleaks                   | 8.30.1                                    |
+| trivy                      | v0.75.0                                   |
+| cosign                     | v3.1.3                                    |
+| syft                       | v1.54.0                                   |
+
+GitHub Actions are pinned by full commit SHA in `.github/workflows/`.
+Dependency updates are manual (no Dependabot).
 
 ## Verifying releases
 
-Release images are signed with cosign (keyless). See [ADR 0004](docs/adr/0004-signed-releases-with-cosign.md).
+Release images are signed with cosign (keyless) and ship an SBOM and build provenance.
+See [ADR 0004](docs/adr/0004-signed-releases-with-cosign.md).
+
+```sh
+cosign verify ghcr.io/axyrasec/core-engine:<tag> \
+  --certificate-identity-regexp '^https://github.com/AxyraSec/core-engine/\.github/workflows/release\.yml@refs/tags/v' \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com
+```
