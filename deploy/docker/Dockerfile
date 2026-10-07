@@ -21,6 +21,7 @@ RUN GOOS=$TARGETOS GOARCH=$TARGETARCH \
 FROM gcr.io/distroless/static-debian13:nonroot@sha256:e2e927ec666bae08560abb3c55d0659eceabb657f56b6782ab500a9fc7f555e3
 
 COPY --from=build /out/engine /engine
+COPY LICENSE NOTICE /licenses/
 
 USER nonroot:nonroot
 

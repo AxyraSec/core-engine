@@ -130,4 +130,5 @@ Found a vulnerability? Do not open a public issue. See [SECURITY.md](SECURITY.md
 
 ## License
 
-[Apache-2.0](LICENSE)
+[Apache-2.0](LICENSE). Copyright 2026 SH Consulting.
+Third-party notices are in [NOTICE](NOTICE).
