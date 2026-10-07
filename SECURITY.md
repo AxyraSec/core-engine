@@ -42,19 +42,22 @@ The project is in early development. No release has been published yet.
 ## Versions in use
 
 Versions the engine is built and checked with. Report issues against these.
+This table is generated from `go.mod`, the Dockerfile and the workflows: run `make versions`, do not edit it by hand.
 
-| Component                  | Version                                   |
-|----------------------------|-------------------------------------------|
-| Go toolchain               | 1.26.8 (minimum `go 1.26.0`)              |
-| `go.yaml.in/yaml/v3`       | v3.0.5 (only third-party Go dependency)   |
-| Build image                | `golang:1.26-alpine`, pinned by digest    |
-| Runtime image              | `distroless/static-debian13:nonroot`, pinned by digest |
-| golangci-lint (gosec, depguard) | v2.14.0                              |
-| govulncheck                | v1.8.0                                    |
-| gitleaks                   | 8.30.1                                    |
-| trivy                      | v0.75.0                                   |
-| cosign                     | v3.1.3                                    |
-| syft                       | v1.54.0                                   |
+<!-- versions:start -->
+| Component | Version |
+|---|---|
+| Go toolchain | 1.26.8 (minimum `go 1.26.0`) |
+| `go.yaml.in/yaml/v3` | v3.0.5 |
+| Image `golang:1.26-alpine` | pinned by digest |
+| Image `gcr.io/distroless/static-debian13:nonroot` | pinned by digest |
+| golangci-lint | v2.14.0 |
+| govulncheck | v1.8.0 |
+| gitleaks | 8.30.1 |
+| trivy | v0.75.0 |
+| cosign | v3.1.3 |
+| syft | v1.54.0 |
+<!-- versions:end -->
 
 GitHub Actions are pinned by full commit SHA in `.github/workflows/`.
 Dependency updates are manual (no Dependabot).

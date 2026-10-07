@@ -37,6 +37,10 @@ security: ## Run govulncheck and gitleaks
 	govulncheck ./...
 	gitleaks git --redact .
 
+.PHONY: versions
+versions: ## Update the versions table in SECURITY.md
+	go run ./scripts/versions
+
 .PHONY: clean
 clean: ## Remove build output
 	rm -rf $(BIN_DIR)
