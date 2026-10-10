@@ -112,6 +112,7 @@ rules:
       - "mcp:filesystem/read_*"
       - "mcp:filesystem/list_*"
       - "mcp:filesystem/search_files"
+      - "mcp:filesystem/directory_tree"
       - "mcp:filesystem/get_file_info"
 ```
 
