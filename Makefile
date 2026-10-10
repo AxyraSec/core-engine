@@ -37,6 +37,10 @@ security: ## Run govulncheck and gitleaks
 	govulncheck ./...
 	gitleaks git --redact .
 
+.PHONY: demo
+demo: ## Run the MCP proxy demo (allow, deny, evidence, tamper detection)
+	./scripts/demo.sh
+
 .PHONY: versions
 versions: ## Update the versions table in SECURITY.md
 	go run ./scripts/versions

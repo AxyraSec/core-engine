@@ -2,7 +2,6 @@ package evidence
 
 import (
 	"errors"
-	"fmt"
 	"slices"
 	"sync"
 	"time"
@@ -19,21 +18,29 @@ type Chain struct {
 	now     func() time.Time
 }
 
-// Option configures a Chain.
-type Option func(*Chain)
+// Option configures a Chain or a FileLog.
+type Option func(*config)
+
+type config struct {
+	now func() time.Time
+}
 
 // WithClock sets the clock used to timestamp records. Mostly useful in tests.
 func WithClock(now func() time.Time) Option {
-	return func(c *Chain) { c.now = now }
+	return func(c *config) { c.now = now }
+}
+
+func newConfig(opts []Option) config {
+	c := config{now: time.Now}
+	for _, opt := range opts {
+		opt(&c)
+	}
+	return c
 }
 
 // NewChain returns an empty chain.
 func NewChain(opts ...Option) *Chain {
-	c := &Chain{now: time.Now}
-	for _, opt := range opts {
-		opt(c)
-	}
-	return c
+	return &Chain{now: newConfig(opts).now}
 }
 
 // Append adds e at the end of the chain and returns the stored record.
@@ -41,17 +48,11 @@ func (c *Chain) Append(e Entry) Record {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	r := Record{
-		Entry:    e,
-		Seq:      1,
-		Time:     c.now().UTC(),
-		PrevHash: GenesisHash,
-	}
+	var prev *Record
 	if n := len(c.records); n > 0 {
-		r.Seq = c.records[n-1].Seq + 1
-		r.PrevHash = c.records[n-1].Hash
+		prev = &c.records[n-1]
 	}
-	r.Hash = r.computeHash()
+	r := next(prev, e, c.now())
 
 	c.records = append(c.records, r)
 	return r
@@ -86,17 +87,11 @@ func Verify(records []Record) error {
 	prev := GenesisHash
 	var want uint64
 	for i := range records {
-		r := &records[i]
 		want++
-		switch {
-		case r.Seq != want:
-			return fmt.Errorf("%w: record #%d: seq is %d, want %d", ErrBrokenChain, i, r.Seq, want)
-		case r.PrevHash != prev:
-			return fmt.Errorf("%w: record #%d: prev hash does not match the previous record", ErrBrokenChain, i)
-		case r.computeHash() != r.Hash:
-			return fmt.Errorf("%w: record #%d: content does not match its hash", ErrBrokenChain, i)
+		if err := check(i, &records[i], want, prev); err != nil {
+			return err
 		}
-		prev = r.Hash
+		prev = records[i].Hash
 	}
 	return nil
 }

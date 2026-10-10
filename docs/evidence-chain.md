@@ -59,17 +59,39 @@ Limits:
 
 ## Storage
 
-In memory only for now. Records are lost on restart. Persistent storage is planned.
+`evidence.FileLog` stores the chain in a JSON Lines file, one record per line:
+
+```json
+{"seq":2,"time":"2026-10-10T19:00:44.63666Z","subject":"agent:billing-bot","action":"tools/call","resource":"mcp:github/delete_repo","allowed":false,"rule_id":"deny-github-delete-repo","reason":"denied_by_rule","prev_hash":"8c1f…","hash":"3e9a…"}
+```
+
+- The file is created with mode `0600`. Records are only appended.
+- Each `Append` writes the line and syncs the file before it returns. If it fails, the
+  MCP proxy denies the call.
+- On open, the whole file is verified. A broken file, a partly written last line or an
+  unknown field makes the open fail: the engine will not extend a chain it cannot trust.
+- After a restart, new records continue the chain found in the file.
+- Only one process should write a given file.
+
+`evidence.Chain` is the same chain kept in memory, for tests and tools.
 
 ## Retention
 
-Not defined yet.
+Not defined yet. The file grows without limit.
 
 ## Verification
 
-`evidence.Verify(records)` walks the chain from the first record and returns the first
-broken record, if any (wrong `Seq`, wrong `PrevHash`, or content that does not match `Hash`).
+```sh
+engine verify -evidence evidence.jsonl
+# evidence OK: 3 records, head 9fabc484…
+```
+
+It reads the file from the first record and reports the first broken record, if any
+(wrong `seq`, wrong `prev_hash`, content that does not match `hash`, or a line that is
+not a valid record). In Go: `evidence.VerifyFile(path)` or `evidence.Verify(records)`.
+
+Keep a copy of the printed head (seq + hash) outside the machine to detect truncation.
 
 ## Export
 
-Not defined yet. `Hash` encodes to lowercase hex in text and JSON.
+The JSON Lines file is the export format. `hash` and `prev_hash` are lowercase hex.

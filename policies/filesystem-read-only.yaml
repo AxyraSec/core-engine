@@ -1,0 +1,15 @@
+# Read-only access to the filesystem MCP server
+# (@modelcontextprotocol/server-filesystem). Writes, moves and edits are denied
+# by default because no rule allows them.
+version: 1
+
+rules:
+  - id: filesystem-read-only
+    effect: allow
+    subjects: ["agent:claude-desktop", "agent:claude-code"]
+    actions: ["tools/call"]
+    resources:
+      - "mcp:filesystem/read_*"
+      - "mcp:filesystem/list_*"
+      - "mcp:filesystem/search_files"
+      - "mcp:filesystem/get_file_info"

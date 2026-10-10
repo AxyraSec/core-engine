@@ -12,6 +12,7 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"encoding/hex"
+	"fmt"
 	"strconv"
 	"time"
 )
@@ -32,27 +33,60 @@ func (h Hash) MarshalText() ([]byte, error) {
 	return []byte(h.String()), nil
 }
 
+// UnmarshalText decodes a hash written by MarshalText.
+func (h *Hash) UnmarshalText(text []byte) error {
+	if len(text) != 2*len(h) {
+		return fmt.Errorf("hash: want %d hex characters, got %d", 2*len(h), len(text))
+	}
+	_, err := hex.Decode(h[:], text)
+	return err
+}
+
 // Entry is the decision to record.
 type Entry struct {
-	Subject  string
-	Action   string
-	Resource string
-	Allowed  bool
-	RuleID   string
-	Reason   string
+	Subject  string `json:"subject"`
+	Action   string `json:"action"`
+	Resource string `json:"resource"`
+	Allowed  bool   `json:"allowed"`
+	RuleID   string `json:"rule_id"`
+	Reason   string `json:"reason"`
 }
 
 // Record is an Entry once it is in the chain.
 type Record struct {
-	Entry
 	// Seq is the position in the chain, starting at 1.
-	Seq uint64
+	Seq uint64 `json:"seq"`
 	// Time is when the record was appended, in UTC.
-	Time time.Time
+	Time time.Time `json:"time"`
+	Entry
 	// PrevHash is the Hash of the previous record, or GenesisHash for the first one.
-	PrevHash Hash
+	PrevHash Hash `json:"prev_hash"`
 	// Hash covers every other field of the record.
-	Hash Hash
+	Hash Hash `json:"hash"`
+}
+
+// next builds the record that follows prev, or the first record when prev is nil.
+func next(prev *Record, e Entry, now time.Time) Record {
+	r := Record{Seq: 1, Time: now.UTC(), Entry: e, PrevHash: GenesisHash}
+	if prev != nil {
+		r.Seq = prev.Seq + 1
+		r.PrevHash = prev.Hash
+	}
+	r.Hash = r.computeHash()
+	return r
+}
+
+// check verifies that r is a valid record #i, following a record with hash prev.
+func check(i int, r *Record, wantSeq uint64, prev Hash) error {
+	switch {
+	case r.Seq != wantSeq:
+		return fmt.Errorf("%w: record #%d: seq is %d, want %d", ErrBrokenChain, i, r.Seq, wantSeq)
+	case r.PrevHash != prev:
+		return fmt.Errorf("%w: record #%d: prev hash does not match the previous record", ErrBrokenChain, i)
+	case r.computeHash() != r.Hash:
+		return fmt.Errorf("%w: record #%d: content does not match its hash", ErrBrokenChain, i)
+	}
+	return nil
 }
 
 // recordVersion is part of every hash, so the encoding can change later

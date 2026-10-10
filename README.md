@@ -38,16 +38,90 @@ Identity → Delegation → Authorization → Enforcement → Evidence
 | Module | Package | State |
 |---|---|---|
 | Authorization | `internal/authz` | ✅ Deny-by-default rules, YAML policy files |
-| Evidence | `internal/evidence` | 🟡 Hash-chained log, in memory only |
-| MCP adapter | `internal/protocol/mcp` | ⬜ Planned |
-| Enforcement | `internal/enforcement` | ⬜ Planned |
-| Identity | `internal/identity` | ⬜ Planned |
+| Evidence | `internal/evidence` | ✅ Hash-chained log on disk, verified on open |
+| MCP adapter | `internal/protocol/mcp` | ✅ stdio proxy, fails closed (HTTP transport planned) |
+| Enforcement | `internal/enforcement` | ⬜ Planned (done inside the MCP proxy for now) |
+| Identity | `internal/identity` | ⬜ Planned (the agent is named by `-subject`) |
 | Delegation | `internal/delegation` | ⬜ Planned |
 
-The modules are not wired together yet: the engine does not intercept agent calls today.
 See [CHANGELOG.md](CHANGELOG.md).
 
-## Quick start
+## See it in action
+
+```sh
+make demo
+```
+
+An agent talks to a fake GitHub MCP server through the engine. You see an allowed call,
+a denied call, a tool hidden from the agent, the evidence log, and a tampered log being caught:
+
+```
+  ✔ ALLOW  mcp:github/create_issue  (allowed_by_rule)
+  ✘ DENY   mcp:github/delete_repo  (denied_by_rule)
+
+  what the agent received:
+  ← #2 tools/list → create_issue, list_repos
+  ← #3 result: the server ran create_issue
+  ← #4 error -32001: denied by Axyra policy
+
+  evidence error: evidence.jsonl: evidence chain is broken: record #1: content does not match its hash
+```
+
+## Use it with an MCP client
+
+Put `engine proxy` in front of any stdio MCP server. The client starts the engine,
+the engine starts the server. Example for Claude Desktop (`claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "/path/to/engine",
+      "args": [
+        "proxy",
+        "-policy", "/path/to/policy.yaml",
+        "-evidence", "/path/to/evidence.jsonl",
+        "-subject", "agent:claude-desktop",
+        "-server", "filesystem",
+        "--", "npx", "-y", "@modelcontextprotocol/server-filesystem", "/path/to/folder"
+      ]
+    }
+  }
+}
+```
+
+With Claude Code:
+
+```sh
+claude mcp add filesystem -- /path/to/engine proxy -policy policy.yaml \
+  -evidence evidence.jsonl -subject agent:claude-code -server filesystem \
+  -- npx -y @modelcontextprotocol/server-filesystem /path/to/folder
+```
+
+A matching policy that lets the agent read but never write
+([policies/filesystem-read-only.yaml](policies/filesystem-read-only.yaml)):
+
+```yaml
+version: 1
+rules:
+  - id: read-only
+    effect: allow
+    subjects: ["agent:claude-desktop", "agent:claude-code"]
+    actions: ["tools/call"]
+    resources:
+      - "mcp:filesystem/read_*"
+      - "mcp:filesystem/list_*"
+      - "mcp:filesystem/search_files"
+      - "mcp:filesystem/get_file_info"
+```
+
+- Every `tools/call` is checked against the resource `mcp:<server>/<tool>`.
+- Denied calls never reach the server; the agent gets error `-32001` with the rule and reason.
+- Every decision is appended to the evidence log. Check it any time:
+  `engine verify -evidence evidence.jsonl`.
+- Design and limits: [ADR 0005](docs/adr/0005-mcp-stdio-proxy-fails-closed.md).
+
+## Write a policy
 
 Requires Go 1.26 or later.
 
@@ -86,6 +160,7 @@ make build      # builds bin/engine
 make test       # runs unit tests with -race
 make lint       # runs golangci-lint
 make security   # runs govulncheck and gitleaks
+make demo       # runs the MCP proxy demo
 make docker     # builds the container image
 ```
 

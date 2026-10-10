@@ -128,10 +128,16 @@ func TestLoadPolicyFileErrors(t *testing.T) {
 	}
 }
 
-// The example shipped in the repo must always load.
-func TestExamplePolicyFile(t *testing.T) {
-	if _, err := LoadPolicyFile("../../policies/example.yaml"); err != nil {
-		t.Fatalf("policies/example.yaml: %v", err)
+// Every policy shipped in the repo must load.
+func TestShippedPolicyFiles(t *testing.T) {
+	files, err := filepath.Glob("../../policies/*.yaml")
+	if err != nil || len(files) == 0 {
+		t.Fatalf("no policy files found: %v", err)
+	}
+	for _, f := range files {
+		if _, err := LoadPolicyFile(f); err != nil {
+			t.Errorf("%s: %v", f, err)
+		}
 	}
 }
 
