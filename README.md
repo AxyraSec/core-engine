@@ -72,9 +72,43 @@ Every release ships static binaries for linux, macOS and windows (amd64, arm64),
 container image `ghcr.io/axyrasec/core-engine`, an SBOM and cosign signatures.
 See [SECURITY.md](SECURITY.md#verifying-releases) to verify them.
 
-## See it in action
+## Try it
+
+### With the installed binary
+
+Needs `engine` (see [Install](#install)) and Node.js for `npx`. This runs the real
+[filesystem MCP server](https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem)
+behind the engine, with a read-only policy, and plays an agent that reads a file and then
+tries to write one:
 
 ```sh
+mkdir -p axyra-try/folder && cd axyra-try && echo hello > folder/hello.txt
+curl -fsSLO https://raw.githubusercontent.com/AxyraSec/core-engine/main/policies/filesystem-read-only.yaml
+
+{
+  echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"try","version":"0"}}}'
+  echo '{"jsonrpc":"2.0","method":"notifications/initialized"}'
+  echo '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"read_text_file","arguments":{"path":"'"$PWD"'/folder/hello.txt"}}}'
+  echo '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"write_file","arguments":{"path":"'"$PWD"'/folder/pwned.txt","content":"x"}}}'
+  sleep 10
+} | engine proxy -policy filesystem-read-only.yaml -evidence evidence.jsonl \
+      -subject agent:claude-code -server filesystem \
+      -- npx -y @modelcontextprotocol/server-filesystem "$PWD/folder"
+
+ls folder                                 # hello.txt only: the write never happened
+engine verify -evidence evidence.jsonl    # evidence OK: 2 records
+```
+
+On stderr you see one line per decision (`allowed=true` for `read_text_file`,
+`allowed=false` for `write_file`). On stdout, the agent gets `hello` for the read and
+error `-32001 denied by Axyra policy` for the write.
+
+### From source
+
+Needs Go 1.26 or later and bash. No AI client and no Node.js:
+
+```sh
+git clone https://github.com/AxyraSec/core-engine && cd core-engine
 make demo
 ```
 
