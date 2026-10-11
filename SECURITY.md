@@ -31,13 +31,13 @@ We will not take legal action against good-faith research that respects this pol
 
 ## Supported versions
 
-The project is in early development. No release has been published yet.
+The project is in early development. Only the latest release and `main` receive security fixes.
 
-| Version                        | Supported |
-|--------------------------------|-----------|
-| `main` (unreleased)            | Yes       |
-| latest release (once tagged)   | Yes       |
-| older releases                 | No        |
+| Version   | Supported |
+|-----------|-----------|
+| `main`    | Yes       |
+| 0.1.x     | Yes       |
+| < 0.1.0   | No        |
 
 ## Versions in use
 

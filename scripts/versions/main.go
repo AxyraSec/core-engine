@@ -66,7 +66,7 @@ func run(check bool) error {
 	if check {
 		return errors.New(securityFile + " is out of date: run `make versions` and commit the result")
 	}
-	return os.WriteFile(securityFile, updated, 0o600)
+	return os.WriteFile(securityFile, updated, 0o600) // #nosec G703 -- constant path
 }
 
 // collect reads every version from its source file.

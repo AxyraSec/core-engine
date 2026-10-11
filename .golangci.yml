@@ -43,6 +43,13 @@ linters:
             - pkg: github.com/AxyraSec/core-engine/internal/enforcement
               desc: internal/evidence must not depend on other internal modules
 
+  exclusions:
+    rules:
+      # Tests read and write files they create in t.TempDir().
+      - path: _test\.go
+        linters: [gosec]
+        text: "G304|G703"
+
 formatters:
   enable:
     - gofmt
