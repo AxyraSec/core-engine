@@ -42,8 +42,13 @@ security: ## Run govulncheck and gitleaks
 	gitleaks git --redact .
 
 .PHONY: demo
-demo: ## Run the MCP proxy demo (allow, deny, evidence, tamper detection)
-	./scripts/demo.sh
+demo: build ## Run the MCP proxy demo (allow, deny, evidence, tamper detection)
+	go build -o $(BIN_DIR)/mcp-demo-server ./test/mcp-demo-server
+	go run ./test/demo -engine $(BIN_DIR)/$(BINARY) -server $(BIN_DIR)/mcp-demo-server -policy policies/example.yaml
+
+.PHONY: docker-demo
+docker-demo: ## Build the demo image (no push)
+	docker build -f deploy/docker/Dockerfile.demo --build-arg VERSION=$(VERSION) -t $(IMAGE)-demo:$(VERSION) .
 
 .PHONY: versions
 versions: ## Update the versions table in SECURITY.md

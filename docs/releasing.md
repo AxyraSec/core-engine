@@ -13,7 +13,10 @@
 4. The Release workflow builds the binaries (linux, macOS, windows × amd64, arm64), pushes
    and signs the image, signs `checksums.txt`, and creates the GitHub Release with
    `core-engine.rb` attached.
-5. Update Homebrew: copy `core-engine.rb` from the release to `Formula/core-engine.rb` in
+5. First release of a new image only: make the package public in
+   **Packages → <image> → Package settings → Change visibility**
+   (`core-engine` and `core-engine-demo` start private).
+6. Update Homebrew: copy `core-engine.rb` from the release to `Formula/core-engine.rb` in
    the `AxyraSec/homebrew-tap` repository, commit and push.
 
 Check locally before tagging: `make dist VERSION=vX.Y.Z` builds the same binaries into `dist/`.

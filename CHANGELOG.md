@@ -7,6 +7,22 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-10-11
+
+Try it with one command.
+
+### Added
+
+- Demo image `ghcr.io/axyrasec/core-engine-demo`: `docker run --rm ghcr.io/axyrasec/core-engine-demo`
+  plays an allowed call, a denied call, a hidden tool and a caught tampering, and checks
+  every result. Signed with cosign like the main image.
+- Images are also tagged `latest`.
+
+### Changed
+
+- `make demo` runs the same Go demo as the image (`test/demo`) instead of a shell script,
+  and CI runs it as an end-to-end test.
+
 ## [0.1.1] - 2026-10-11
 
 Install on every platform.
@@ -43,6 +59,7 @@ tamper-evident evidence of each decision.
 - Signed releases: binaries for linux/amd64 and linux/arm64, container image
   `ghcr.io/axyrasec/core-engine`, cosign keyless signatures, SPDX SBOM, build provenance.
 
-[Unreleased]: https://github.com/AxyraSec/core-engine/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/AxyraSec/core-engine/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/AxyraSec/core-engine/releases/tag/v0.1.2
 [0.1.1]: https://github.com/AxyraSec/core-engine/releases/tag/v0.1.1
 [0.1.0]: https://github.com/AxyraSec/core-engine/releases/tag/v0.1.0

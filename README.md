@@ -74,6 +74,16 @@ See [SECURITY.md](SECURITY.md#verifying-releases) to verify them.
 
 ## Try it
 
+### With Docker, nothing to install
+
+```sh
+docker run --rm ghcr.io/axyrasec/core-engine-demo
+```
+
+An agent talks to a fake GitHub MCP server through the engine: one call allowed, one
+denied, a tool hidden from the agent, then the evidence log is tampered with and the
+engine catches it. Every result is checked; the demo fails if one is wrong.
+
 ### With the installed binary
 
 Needs `engine` (see [Install](#install)) and Node.js for `npx`. This runs the real
@@ -105,7 +115,7 @@ error `-32001 denied by Axyra policy` for the write.
 
 ### From source
 
-Needs Go 1.26 or later and bash. No AI client and no Node.js:
+Needs Go 1.26 or later. No AI client and no Node.js. Same demo as the Docker image:
 
 ```sh
 git clone https://github.com/AxyraSec/core-engine && cd core-engine

@@ -55,6 +55,11 @@ jobs:
       - name: Check SECURITY.md versions
         run: go run ./scripts/versions -check
 
+      - name: End-to-end demo
+        run: make demo
+        env:
+          NO_COLOR: "1"
+
   build:
     name: Build
     runs-on: ubuntu-latest
@@ -93,6 +98,15 @@ jobs:
         with:
           context: .
           file: deploy/docker/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: false
+          build-args: VERSION=${{ github.sha }}
+
+      - name: Build demo image (no push)
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          file: deploy/docker/Dockerfile.demo
           platforms: linux/amd64,linux/arm64
           push: false
           build-args: VERSION=${{ github.sha }}
