@@ -16,7 +16,6 @@ import (
 	"os/exec"
 	"os/signal"
 	"sync"
-	"syscall"
 	"time"
 
 	"github.com/AxyraSec/core-engine/internal/authz"
@@ -116,13 +115,13 @@ func runProxy(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 	}
 	defer func() { _ = log.Close() }()
 
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	ctx, stop := signal.NotifyContext(context.Background(), stopSignals...)
 	defer stop()
 
 	// #nosec G204 -- the operator chooses which MCP server to run.
 	cmd := exec.CommandContext(ctx, command[0], command[1:]...)
 	cmd.Stderr = stderr
-	cmd.Cancel = func() error { return cmd.Process.Signal(syscall.SIGTERM) }
+	cmd.Cancel = func() error { return stopServer(cmd) }
 	cmd.WaitDelay = stopDelay
 
 	serverIn, err := cmd.StdinPipe()

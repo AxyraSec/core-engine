@@ -7,6 +7,22 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-11
+
+Install on every platform.
+
+### Added
+
+- Release binaries for macOS (amd64, arm64) and Windows (amd64, arm64), next to Linux.
+- `install.sh`: one-line install on Linux and macOS, with checksum check and, when
+  `cosign` is installed, signature check.
+- Homebrew formula (`core-engine.rb`) generated and attached to every release.
+- `make dist` builds the release binaries locally; CI checks that every platform compiles.
+
+### Fixed
+
+- On Windows, `engine proxy` stops the MCP server with a kill, since Windows has no SIGTERM.
+
 ## [0.1.0] - 2026-10-10
 
 First release: an MCP proxy that enforces a policy on every tool call and keeps
@@ -27,5 +43,6 @@ tamper-evident evidence of each decision.
 - Signed releases: binaries for linux/amd64 and linux/arm64, container image
   `ghcr.io/axyrasec/core-engine`, cosign keyless signatures, SPDX SBOM, build provenance.
 
-[Unreleased]: https://github.com/AxyraSec/core-engine/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/AxyraSec/core-engine/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/AxyraSec/core-engine/releases/tag/v0.1.1
 [0.1.0]: https://github.com/AxyraSec/core-engine/releases/tag/v0.1.0

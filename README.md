@@ -46,6 +46,32 @@ Identity → Delegation → Authorization → Enforcement → Evidence
 
 See [CHANGELOG.md](CHANGELOG.md).
 
+## Install
+
+Linux and macOS:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/AxyraSec/core-engine/main/install.sh | sh
+```
+
+The script picks the binary for your OS and CPU, checks it against the release
+`checksums.txt` (and its cosign signature if `cosign` is installed), and installs `engine`
+in `/usr/local/bin` or `~/.local/bin`. Pin a version with `sh -s -- -v v0.1.1`.
+
+Homebrew (macOS, Linux):
+
+```sh
+brew install axyrasec/tap/core-engine
+```
+
+Windows: download `engine_windows_amd64.exe` (or `_arm64.exe`) from the
+[releases](https://github.com/AxyraSec/core-engine/releases), rename it `engine.exe`,
+and put it in a folder of your `PATH`.
+
+Every release ships static binaries for linux, macOS and windows (amd64, arm64), a
+container image `ghcr.io/axyrasec/core-engine`, an SBOM and cosign signatures.
+See [SECURITY.md](SECURITY.md#verifying-releases) to verify them.
+
 ## See it in action
 
 ```sh
@@ -161,6 +187,7 @@ make build      # builds bin/engine
 make test       # runs unit tests with -race
 make lint       # runs golangci-lint
 make security   # runs govulncheck and gitleaks
+make dist       # builds release binaries for every platform into dist/
 make demo       # runs the MCP proxy demo
 make docker     # builds the container image
 ```

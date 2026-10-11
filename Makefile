@@ -26,6 +26,10 @@ test: ## Run unit tests with the race detector
 build: ## Build a static binary into bin/
 	CGO_ENABLED=0 go build -trimpath -ldflags "$(LDFLAGS)" -o $(BIN_DIR)/$(BINARY) $(PKG)
 
+.PHONY: dist
+dist: ## Build release binaries for linux, macOS and windows into dist/
+	scripts/build-release.sh $(VERSION)
+
 .PHONY: docker
 docker: ## Build the container image (no push)
 	docker build -f $(DOCKERFILE) --build-arg VERSION=$(VERSION) -t $(IMAGE):$(VERSION) .

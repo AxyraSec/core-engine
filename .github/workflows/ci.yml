@@ -74,6 +74,9 @@ jobs:
       - name: Smoke test
         run: ./bin/engine
 
+      - name: Cross-compile release binaries
+        run: scripts/build-release.sh ci
+
   docker:
     name: Docker build
     runs-on: ubuntu-latest

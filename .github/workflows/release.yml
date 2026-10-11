@@ -31,16 +31,11 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - name: Build binaries
-        env:
-          VERSION: ${{ github.ref_name }}
-        run: |
-          for arch in amd64 arm64; do
-            CGO_ENABLED=0 GOOS=linux GOARCH=$arch go build -trimpath \
-              -ldflags "-s -w -X main.version=${VERSION}" -o "dist/engine_linux_${arch}" ./cmd/engine
-          done
-          cp LICENSE NOTICE dist/
-          (cd dist && sha256sum engine_* > checksums.txt)
+      - name: Build binaries (linux, macOS, windows × amd64, arm64)
+        run: scripts/build-release.sh "$GITHUB_REF_NAME"
+
+      - name: Generate Homebrew formula
+        run: scripts/homebrew-formula.sh "$GITHUB_REF_NAME" dist/checksums.txt > dist/core-engine.rb
 
       - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
