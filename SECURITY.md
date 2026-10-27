@@ -47,7 +47,7 @@ This table is generated from `go.mod`, the Dockerfile and the workflows: run `ma
 <!-- versions:start -->
 | Component | Version |
 |---|---|
-| Go toolchain | 1.26.8 (minimum `go 1.26.0`) |
+| Go toolchain | 1.26.10 (minimum `go 1.26.0`) |
 | `go.yaml.in/yaml/v3` | v3.0.5 |
 | Image `golang:1.26-alpine` | pinned by digest |
 | Image `gcr.io/distroless/static-debian13:nonroot` | pinned by digest |
