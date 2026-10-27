@@ -1,0 +1,40 @@
+# Live dev environment for the MCP Streamable HTTP transport. See README.md.
+#   make dev-up / make dev-down
+# Ports are bound to 127.0.0.1 only.
+
+name: axyra-dev
+
+services:
+  # Fake GitHub MCP server from this repository (test/mcp-demo-server).
+  # Restart it to pick up code changes: docker compose restart github
+  github:
+    image: golang:1.26-alpine@sha256:8ac98ca534ac3f51e1f420a1dd2c15e74c75cfa0f23f3ad27eb5d7236c349a0c
+    working_dir: /src
+    command: ["go", "run", "./test/mcp-demo-server", "-http", ":3001"]
+    environment:
+      GOTOOLCHAIN: local
+      GOFLAGS: -buildvcs=false
+    volumes:
+      - ../..:/src:ro
+      - go-cache:/root/.cache/go-build
+      - go-mod:/go/pkg/mod
+    ports:
+      - "127.0.0.1:3001:3001"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/healthz"]
+      interval: 3s
+      retries: 40
+
+  # Reference MCP server from the MCP project: sessions, SSE streams,
+  # notifications, progress, sampling. Real-world traffic for the proxy.
+  everything:
+    image: node:22-alpine
+    command: ["npx", "-y", "@modelcontextprotocol/server-everything@2026.8.31", "streamableHttp"]
+    environment:
+      PORT: "3001"
+    ports:
+      - "127.0.0.1:3002:3001"
+
+volumes:
+  go-cache:
+  go-mod:

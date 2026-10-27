@@ -46,6 +46,16 @@ demo: build ## Run the MCP proxy demo (allow, deny, evidence, tamper detection)
 	go build -o $(BIN_DIR)/mcp-demo-server ./test/mcp-demo-server
 	go run ./test/demo -engine $(BIN_DIR)/$(BINARY) -server $(BIN_DIR)/mcp-demo-server -policy policies/example.yaml
 
+DEV_COMPOSE := docker compose -f deploy/dev/compose.yaml
+
+.PHONY: dev-up
+dev-up: ## Start the live MCP HTTP dev environment (deploy/dev)
+	$(DEV_COMPOSE) up -d --wait --wait-timeout 300
+
+.PHONY: dev-down
+dev-down: ## Stop the dev environment
+	$(DEV_COMPOSE) down --remove-orphans
+
 .PHONY: docker-demo
 docker-demo: ## Build the demo image (no push)
 	docker build -f deploy/docker/Dockerfile.demo --build-arg VERSION=$(VERSION) -t $(IMAGE)-demo:$(VERSION) .
